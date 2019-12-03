@@ -40,39 +40,6 @@ def conv(in_channels, out_channels, kernel_size, stride=2, padding=1, batch_norm
         layers.append(nn.BatchNorm2d(out_channels))
     return nn.Sequential(*layers)
 
-
-class DCGenerator(nn.Module):
-    def __init__(self, noise_size, conv_dim):
-        super(DCGenerator, self).__init__()
-
-        ###########################################
-        ##   FILL THIS IN: CREATE ARCHITECTURE   ##
-        ###########################################
-
-        # self.deconv1 = deconv(...)
-        # self.deconv2 = deconv(...)
-        # self.deconv3 = deconv(...)
-        # self.deconv4 = deconv(...)
-
-    def forward(self, z):
-        """Generates an image given a sample of random noise.
-
-            Input
-            -----
-                z: BS x noise_size x 1 x 1   -->  16x100x1x1
-
-            Output
-            ------
-                out: BS x channels x image_width x image_height  -->  16x3x32x32
-        """
-
-        out = F.relu(self.deconv1(z))
-        out = F.relu(self.deconv2(out))
-        out = F.relu(self.deconv3(out))
-        out = F.tanh(self.deconv4(out))
-        return out
-
-
 class ResnetBlock(nn.Module):
     def __init__(self, conv_dim):
         super(ResnetBlock, self).__init__()
@@ -97,13 +64,18 @@ class CycleGenerator(nn.Module):
         # 1. Define the encoder part of the generator (that extracts features from the input image)
         # self.conv1 = conv(...)
         # self.conv2 = conv(...)
+        self.conv1 = conv(3, conv_dim, 5, init_zero_weights=init_zero_weights)
+        self.conv2 = conv(conv_dim, 2*conv_dim, 5)
 
         # 2. Define the transformation part of the generator
         # self.resnet_block = ...
+        self.resnet_block = ResnetBlock(2*conv_dim)
 
         # 3. Define the decoder part of the generator (that builds up the output image from features)
         # self.deconv1 = deconv(...)
         # self.deconv2 = deconv(...)
+        self.deconv1 = deconv(2*conv_dim, conv_dim, 5)
+        self.deconv2 = deconv(conv_dim, 3, 5, batch_norm=False)
 
     def forward(self, x):
         """Generates an image conditioned on an input image.

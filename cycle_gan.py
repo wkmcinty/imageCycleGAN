@@ -232,7 +232,10 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         # 1. Compute the discriminator losses on real images
         # D_X_loss = ...
         # D_Y_loss = ...
-
+        real_labels = utils.to_var(torch.ones(images_X.size(0)))
+        D_X_loss = nn.Functional.mse_loss(D_X(images_X), real_labels)
+        real_labels = utils.to_var(torch.ones(images_Y.size(0)))
+        D_Y_loss = nn.Functional.mse_loss(D_Y(images_Y), real_labels)       
         d_real_loss = D_X_loss + D_Y_loss
         d_real_loss.backward()
         d_optimizer.step()

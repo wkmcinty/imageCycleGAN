@@ -245,15 +245,21 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
         # 2. Generate fake images that look like domain X based on real images in domain Y
         # fake_X = ...
+        fake_X = G_YtoX(images_Y)
 
         # 3. Compute the loss for D_X
         # D_X_loss = ...
+        fake_labels = utils.to_var(torch.zeros(fake_X.size(0)))
+        D_X_loss = nn.Functional.mse_loss(D_X(fake_X), fake_labels)
 
         # 4. Generate fake images that look like domain Y based on real images in domain X
         # fake_Y = ...
-
+        fake_Y = G_XtoY(images_X)
         # 5. Compute the loss for D_Y
         # D_Y_loss = ...
+        fake_labels = utils.to_var(torch.zeros(fake_Y.size(0)))
+        D_Y_loss = nn.Functional.mse_loss(D_Y(fake_Y),fake_labels)
+        
 
         d_fake_loss = D_X_loss + D_Y_loss
         d_fake_loss.backward()

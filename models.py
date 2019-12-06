@@ -64,13 +64,13 @@ class CycleGenerator(nn.Module):
         # 1. Define the encoder part of the generator (that extracts features from the input image)
         # self.conv1 = conv(...)
         # self.conv2 = conv(...)
-        self.conv1 = conv(3, conv_dim, 4)
-        self.conv2 = conv(conv_dim, conv_dim * 2, 4)
+        self.conv1 = conv(3, conv_dim, 4)#init_zero_weights=init_zero_weights)
+        self.conv2 = conv(conv_dim, conv_dim * 2, 4)#,init_zero_weights=init_zero_weights)
 
         self.resnet_block = ResnetBlock(conv_dim * 2)
 
         self.deconv1 = deconv(conv_dim * 2, conv_dim, 4)
-        self.deconv2 = deconv(conv_dim, 3, 4, batch_norm = False)
+        self.deconv2 = deconv(conv_dim, 3, 4, batch_norm=False)
 
 
         # 2. Define the transformation part of the generator

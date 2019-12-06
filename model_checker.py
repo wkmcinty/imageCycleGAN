@@ -92,8 +92,8 @@ def check_cycle_generator():
     output = G_XtoY(images)
     output_np = output.data.cpu().numpy()
 
-    print("my out: ",output_np)
-    print("expected: ",cycle_generator_expected)
+    print("my out: ",output_np[0][0][0])
+    print("expected: ",cycle_generator_expected[0][0][0])
 
     if np.allclose(output_np, cycle_generator_expected):
         print('CycleGenerator output: EQUAL')

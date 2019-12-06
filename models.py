@@ -115,10 +115,13 @@ class DCDiscriminator(nn.Module):
         # self.conv2 = conv(...)
         # self.conv3 = conv(...)
         # self.conv4 = conv(...)
-        self.conv1(3, conv_dim, 5);
+        print("hi")
+        self.conv1 = conv(3, conv_dim, 5);
         self.conv2 = conv(conv_dim, 2*conv_dim, 5)
+        print('hi')
         self.conv3 = conv(2*conv_dim, 4*conv_dim, 5)
         self.conv4 = conv(4*conv_dim, 1, 5, padding=1, batch_norm=False)
+        print('hi')
 
 
     def forward(self, x):

@@ -23,7 +23,8 @@ from torch.autograd import Variable
 import numpy as np
 
 # Local imports
-from models import DCGenerator, DCDiscriminator, CycleGenerator
+#from models import DCGenerator, DCDiscriminator, CycleGenerator
+from models import DCDiscriminator, CycleGenerator
 
 
 def count_parameters(model):
@@ -47,31 +48,6 @@ def sample_noise(dim):
     return Variable(torch.rand(1, dim) * 2 - 1).unsqueeze(2).unsqueeze(3)
 
 
-def check_dc_generator():
-    """Checks the output and number of parameters of the DCGenerator class.
-    """
-    state = torch.load('checker_files/dc_generator.pt')
-
-    G = DCGenerator(noise_size=100, conv_dim=32)
-    G.load_state_dict(state['state_dict'])
-    noise = state['input']
-    dc_generator_expected = state['output']
-
-    output = G(noise)
-    output_np = output.data.cpu().numpy()
-
-    if np.allclose(output_np, dc_generator_expected):
-        print('DCGenerator output: EQUAL')
-    else:
-        print('DCGenerator output: NOT EQUAL')
-
-    num_params = count_parameters(G)
-    expected_params = 370624
-
-    print('DCGenerator #params = {}, expected #params = {}, {}'.format(
-          num_params, expected_params, 'EQUAL' if num_params == expected_params else 'NOT EQUAL'))
-
-    print('-' * 80)
 
 
 def check_dc_discriminator():
@@ -80,6 +56,7 @@ def check_dc_discriminator():
     state = torch.load('checker_files/dc_discriminator.pt')
 
     D = DCDiscriminator(conv_dim=32)
+    print('hi')
     D.load_state_dict(state['state_dict'])
     images = state['input']
     dc_discriminator_expected = state['output']
@@ -130,10 +107,10 @@ def check_cycle_generator():
 
 if __name__ == '__main__':
 
-    try:
-        check_dc_generator()
-    except:
-        print('Crashed while checking DCGenerator. Maybe not implemented yet?')
+#    try:
+ #       check_dc_generator()
+  #  except:
+   #     print('Crashed while checking DCGenerator. Maybe not implemented yet?')
 
     try:
         check_dc_discriminator()

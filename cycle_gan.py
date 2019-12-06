@@ -34,6 +34,7 @@ import torch.optim as optim
 import numpy as np
 import scipy
 import scipy.misc
+import imageio
 
 # Local imports
 import utils
@@ -163,12 +164,14 @@ def save_samples(iteration, fixed_Y, fixed_X, G_YtoX, G_XtoY, opts):
 
     merged = merge_images(X, fake_Y, opts)
     path = os.path.join(opts.sample_dir, 'sample-{:06d}-X-Y.png'.format(iteration))
-    scipy.misc.imsave(path, merged)
+    #scipy.misc.imsave(path, merged)
+    imageio.imwrite(path,merged)
     print('Saved {}'.format(path))
 
     merged = merge_images(Y, fake_X, opts)
     path = os.path.join(opts.sample_dir, 'sample-{:06d}-Y-X.png'.format(iteration))
-    scipy.misc.imsave(path, merged)
+    #scipy.misc.imsave(path, merged)
+    imageio.imwrite(path,merged)
     print('Saved {}'.format(path))
 
 
@@ -322,8 +325,11 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         if iteration % opts.log_step == 0:
             print('Iteration [{:5d}/{:5d}] | d_real_loss: {:6.4f} | d_Y_loss: {:6.4f} | d_X_loss: {:6.4f} | '
                   'd_fake_loss: {:6.4f} | g_loss: {:6.4f}'.format(
-                    iteration, opts.train_iters, d_real_loss.data[0], D_Y_loss.data[0],
-                    D_X_loss.data[0], d_fake_loss.data[0], g_loss.data[0]))
+                    iteration, 
+                    opts.train_iters, 
+                    d_real_loss.data, 
+                    D_Y_loss.data,
+                    D_X_loss.data, d_fake_loss.data, g_loss.data))
 
 
         # Save the generated samples

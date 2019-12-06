@@ -232,10 +232,9 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         # 1. Compute the discriminator losses on real images
         # D_X_loss = ...
         # D_Y_loss = ...
-        real_labels = utils.to_var(torch.ones(images_X.size(0)))
-        D_X_loss = nn.Functional.mse_loss(D_X(images_X), real_labels)
-        real_labels = utils.to_var(torch.ones(images_Y.size(0)))
-        D_Y_loss = nn.Functional.mse_loss(D_Y(images_Y), real_labels)       
+        D_X_loss = torch.mean((D_X.forward(images_X)-1)**2)
+        D_Y_loss = torch.mean((D_Y.forward(images_Y)-1)**2)
+
         d_real_loss = D_X_loss + D_Y_loss
         d_real_loss.backward()
         d_optimizer.step()
@@ -245,21 +244,18 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
         # 2. Generate fake images that look like domain X based on real images in domain Y
         # fake_X = ...
-        fake_X = G_YtoX(images_Y)
+        fake_X = G_YtoX.forward((images_Y))
 
         # 3. Compute the loss for D_X
         # D_X_loss = ...
-        fake_labels = utils.to_var(torch.zeros(fake_X.size(0)))
-        D_X_loss = nn.Functional.mse_loss(D_X(fake_X), fake_labels)
+        D_X_loss = torch.mean((D_X.forward(fake_X))**2)
 
         # 4. Generate fake images that look like domain Y based on real images in domain X
         # fake_Y = ...
-        fake_Y = G_XtoY(images_X)
+        fake_Y = G_XtoY.forward(images_X)
         # 5. Compute the loss for D_Y
         # D_Y_loss = ...
-        fake_labels = utils.to_var(torch.zeros(fake_Y.size(0)))
-        D_Y_loss = nn.Functional.mse_loss(D_Y(fake_Y),fake_labels)
-        
+        D_Y_loss = torch.mean((D_Y.forward(fake_Y))**2)
 
         d_fake_loss = D_X_loss + D_Y_loss
         d_fake_loss.backward()
@@ -279,18 +275,17 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
         # 1. Generate fake images that look like domain X based on real images in domain Y
         # fake_X = ...
-        fake_X = G_YtoX(images_Y)
+        fake_X = G_YtoX.forward(images_Y)
 
         # 2. Compute the generator loss based on domain X
         # g_loss = ...
-        fake_labels = utils.to_var(torch.ones(fake_X.size(0)))
-        g_loss = nn.Functional.mse_loss(D_X(fake_X), fake_labels)
+        g_loss = torch.mean((D_X.forward(fake_X)-1)**2)
 
         if opts.use_cycle_consistency_loss:
             reconstructed_Y = G_XtoY(fake_X)
             # 3. Compute the cycle consistency loss (the reconstruction loss)
             # cycle_consistency_loss = ...
-            cycle_consistency_loss = (torch.abs(reconstructed_Y - images_Y).sum() / images_Y.size(0)) * opts.lambdacycle
+            cycle_consistency_loss = torch.mean((images_Y - reconstructed_Y)**2)
             g_loss += cycle_consistency_loss
 
         g_loss.backward()
@@ -306,18 +301,17 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
         # 1. Generate fake images that look like domain Y based on real images in domain X
         # fake_Y = ...
-        fake_Y = G_XtoY(images_X)
+        fake_Y = G_XtoY.forward(images_X)
 
         # 2. Compute the generator loss based on domain Y
         # g_loss = ...
-        fake_labels = utils.to_var(torch.ones(fake_Y.size(0)))
-        g_loss = nn.Functional.mse_loss(D_Y(fake_Y), fake_labels)
+        g_loss = torch.mean((D_Y.forward(fake_Y)-1)**2)
 
         if opts.use_cycle_consistency_loss:
             reconstructed_X = G_YtoX(fake_Y)
             # 3. Compute the cycle consistency loss (the reconstruction loss)
             # cycle_consistency_loss = ...
-            cycle_consistency_loss = (torch.abs(reconstructed_X - images_X).sum() / images_X.size(0)) * opts.lambdacycle
+            cycle_consistency_loss = torch.mean((images_X - reconstructed_X)**2)
             g_loss += cycle_consistency_loss
 
         g_loss.backward()

@@ -1,16 +1,7 @@
-# CSC 321, Assignment 4
+# This is a script to check whether the outputs of Generator, Discriminator, and CycleGenerator models produce 
+# the expected outputs.
 #
-# This is a script to check whether the outputs of your CycleGenerator, DCDiscriminator, and
-# CycleGenerator models produce the expected outputs.
-#
-# NOTE THAT THIS MODEL CHECKER IS PROVIDED FOR CONVENIENCE ONLY, AND MAY PRODUCE FALSE NEGATIVES.
-# DO NOT USE THIS AS THE ONLY WAY TO CHECK THAT YOUR MODEL IS CORRECT.
-#
-# Usage:
-# ======
-#
-#    python model_checker.py
-#
+# Usage: python model_checker.py
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -23,7 +14,6 @@ from torch.autograd import Variable
 import numpy as np
 
 # Local imports
-#from models import DCGenerator, DCDiscriminator, CycleGenerator
 from models import DCDiscriminator, CycleGenerator
 
 
@@ -111,14 +101,8 @@ def check_cycle_generator():
 
 if __name__ == '__main__':
 
-#    try:
- #       check_dc_generator()
-  #  except:
-   #     print('Crashed while checking DCGenerator. Maybe not implemented yet?')
-
     try:
         check_dc_discriminator()
-#    except Exception as e:
     except:
         #print(e)
         print('Crashed while checking DCDiscriminator. Maybe not implemented yet?')

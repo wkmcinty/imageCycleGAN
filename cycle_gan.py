@@ -1,22 +1,3 @@
-# CSC 321, Assignment 4
-#
-# This is the main training file for the CycleGAN part of the assignment.
-#
-# Usage:
-# ======
-#    To train with the default hyperparamters (saves results to samples_cyclegan/):
-#       python cycle_gan.py
-#
-#    To train with cycle consistency loss (saves results to samples_cyclegan_cycle/):
-#       python cycle_gan.py --use_cycle_consistency_loss
-#
-#
-#    For optional experimentation:
-#    -----------------------------
-#    If you have a powerful computer (ideally with a GPU), then you can obtain better results by
-#    increasing the number of filters used in the generator and/or discriminator, as follows:
-#      python cycle_gan.py --g_conv_dim=64 --d_conv_dim=64
-
 import os
 import pdb
 import pickle
@@ -221,20 +202,12 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         images_Y, labels_Y = utils.to_var(images_Y), utils.to_var(labels_Y).long().squeeze()
 
 
-        # ============================================
-        #            TRAIN THE DISCRIMINATORS
-        # ============================================
-
-        #########################################
-        ##             FILL THIS IN            ##
-        #########################################
-
+        # TRAINING THE DISCRIMINATORS
+        
         # Train with real images
         d_optimizer.zero_grad()
 
-        # 1. Compute the discriminator losses on real images
-        # D_X_loss = ...
-        # D_Y_loss = ...
+        # Compute the discriminator losses on real images
         D_X_loss = torch.mean((D_X.forward(images_X)-1)**2)
         D_Y_loss = torch.mean((D_Y.forward(images_Y)-1)**2)
 
@@ -245,19 +218,16 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         # Train with fake images
         d_optimizer.zero_grad()
 
-        # 2. Generate fake images that look like domain X based on real images in domain Y
-        # fake_X = ...
+        # Generate fake images that look like domain X based on real images in domain 
         fake_X = G_YtoX.forward((images_Y))
 
-        # 3. Compute the loss for D_X
-        # D_X_loss = ...
+        # Compute the loss for D_X
         D_X_loss = torch.mean((D_X.forward(fake_X))**2)
 
-        # 4. Generate fake images that look like domain Y based on real images in domain X
-        # fake_Y = ...
+        # Generate fake images that look like domain Y based on real images in domain X
         fake_Y = G_XtoY.forward(images_X)
-        # 5. Compute the loss for D_Y
-        # D_Y_loss = ...
+        
+        # Compute the loss for D_Y
         D_Y_loss = torch.mean((D_Y.forward(fake_Y))**2)
 
         d_fake_loss = D_X_loss + D_Y_loss
@@ -266,28 +236,19 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
 
 
-        # =========================================
-        #            TRAIN THE GENERATORS
-        # =========================================
+        # TRAINING THE GENERATORS
 
-
-        #########################################
-        ##    FILL THIS IN: Y--X-->Y CYCLE     ##
-        #########################################
         g_optimizer.zero_grad()
 
-        # 1. Generate fake images that look like domain X based on real images in domain Y
-        # fake_X = ...
+        # Generate fake images that look like domain X based on real images in domain Y
         fake_X = G_YtoX.forward(images_Y)
 
-        # 2. Compute the generator loss based on domain X
-        # g_loss = ...
+        # Compute the generator loss based on domain X
         g_loss = torch.mean((D_X.forward(fake_X)-1)**2)
 
         if opts.use_cycle_consistency_loss:
             reconstructed_Y = G_XtoY(fake_X)
-            # 3. Compute the cycle consistency loss (the reconstruction loss)
-            # cycle_consistency_loss = ...
+            # Compute the cycle consistency loss (the reconstruction loss)
             cycle_consistency_loss = torch.mean((images_Y - reconstructed_Y)**2)
             g_loss += cycle_consistency_loss
 
@@ -296,24 +257,19 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
 
 
 
-        #########################################
-        ##    FILL THIS IN: X--Y-->X CYCLE     ##
-        #########################################
+        # X--Y-->X CYCLE 
 
         g_optimizer.zero_grad()
 
-        # 1. Generate fake images that look like domain Y based on real images in domain X
-        # fake_Y = ...
+        # Generate fake images that look like domain Y based on real images in domain X
         fake_Y = G_XtoY.forward(images_X)
 
-        # 2. Compute the generator loss based on domain Y
-        # g_loss = ...
+        # Compute the generator loss based on domain Y
         g_loss = torch.mean((D_Y.forward(fake_Y)-1)**2)
 
         if opts.use_cycle_consistency_loss:
             reconstructed_X = G_YtoX(fake_Y)
-            # 3. Compute the cycle consistency loss (the reconstruction loss)
-            # cycle_consistency_loss = ...
+            # Compute the cycle consistency loss (the reconstruction loss)
             cycle_consistency_loss = torch.mean((images_X - reconstructed_X)**2)
             g_loss += cycle_consistency_loss
 

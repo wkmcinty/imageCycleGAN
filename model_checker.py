@@ -56,13 +56,14 @@ def check_dc_discriminator():
     state = torch.load('checker_files/dc_discriminator.pt')
 
     D = DCDiscriminator(conv_dim=32)
-    print('hi')
     D.load_state_dict(state['state_dict'])
     images = state['input']
     dc_discriminator_expected = state['output']
 
     output = D(images)
     output_np = output.data.cpu().numpy()
+    print("my out: ",output_np)
+    print("expected: ",dc_discriminator_expected)
 
     if np.allclose(output_np, dc_discriminator_expected):
         print('DCDiscriminator output: EQUAL')
@@ -114,7 +115,9 @@ if __name__ == '__main__':
 
     try:
         check_dc_discriminator()
+#    except Exception as e:
     except:
+        #print(e)
         print('Crashed while checking DCDiscriminator. Maybe not implemented yet?')
 
     try:

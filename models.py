@@ -1,15 +1,6 @@
-# CSC 321, Assignment 4
-#
-# This file contains the models used for both parts of the assignment:
-#
-#   - DCGenerator       --> Used in the vanilla GAN in Part 1
-#   - CycleGenerator    --> Used in the CycleGAN in Part 2
-#   - DCDiscriminator   --> Used in both the vanilla GAN and CycleGAN (Parts 1 and 2)
-#
-# For the assignment, you are asked to create the architectures of these three networks by
-# filling in the __init__ methods in the DCGenerator, CycleGenerator, and DCDiscriminator classes.
-# Note that the forward passes of these models are provided for you, so the only part you need to
-# fill in is __init__.
+# This file contains the models:
+#   - CycleGenerator    
+#   - DCDiscriminator 
 
 import pdb
 import torch
@@ -49,7 +40,6 @@ class ResnetBlock(nn.Module):
         out = x + self.conv_layer(x)
         return out
 
-
 class CycleGenerator(nn.Module):
     """Defines the architecture of the generator network.
        Note: Both generators G_XtoY and G_YtoX have the same architecture in this assignment.
@@ -57,31 +47,16 @@ class CycleGenerator(nn.Module):
     def __init__(self, conv_dim=64, init_zero_weights=False):
         super(CycleGenerator, self).__init__()
 
-        ###########################################
-        ##   FILL THIS IN: CREATE ARCHITECTURE   ##
-        ###########################################
+        # Define the encoder part of the generator (that extracts features from the input image)
+        self.conv1 = conv(3, conv_dim, 4)
+        self.conv2 = conv(conv_dim, conv_dim * 2, 4)
 
-        # 1. Define the encoder part of the generator (that extracts features from the input image)
-        # self.conv1 = conv(...)
-        # self.conv2 = conv(...)
-        self.conv1 = conv(3, conv_dim, 4)#init_zero_weights=init_zero_weights)
-        self.conv2 = conv(conv_dim, conv_dim * 2, 4)#,init_zero_weights=init_zero_weights)
-
+        # Define the transformation part of the generator
         self.resnet_block = ResnetBlock(conv_dim * 2)
 
+        # Define the decoder part of the generator (that builds up the output image from features)
         self.deconv1 = deconv(conv_dim * 2, conv_dim, 4)
         self.deconv2 = deconv(conv_dim, 3, 4, batch_norm=False)
-
-
-        # 2. Define the transformation part of the generator
-        # self.resnet_block = ...
-#        self.resnet_block = ResnetBlock(2*conv_dim)
-
-        # 3. Define the decoder part of the generator (that builds up the output image from features)
-        # self.deconv1 = deconv(...)
-        # self.deconv2 = deconv(...)
-#        self.deconv1 = deconv(2*conv_dim, conv_dim, 4)
- #       self.deconv2 = deconv(conv_dim, 3, 4, batch_norm=False)
 
     def forward(self, x):
         """Generates an image conditioned on an input image.
@@ -113,14 +88,6 @@ class DCDiscriminator(nn.Module):
     def __init__(self, conv_dim=64):
         super(DCDiscriminator, self).__init__()
 
-        ###########################################
-        ##   FILL THIS IN: CREATE ARCHITECTURE   ##
-        ###########################################
-
-        # self.conv1 = conv(...)
-        # self.conv2 = conv(...)
-        # self.conv3 = conv(...)
-        # self.conv4 = conv(...)
         self.conv1 = conv(3, conv_dim, 4);
         self.conv2 = conv(conv_dim, 2*conv_dim, 4)
         self.conv3 = conv(2*conv_dim, 4*conv_dim, 4)
